@@ -1,4 +1,4 @@
-name: Deploy SPA to S3 + CloudFront
+name: Deploy SPA to S3
 
 on:
   push:
@@ -38,9 +38,6 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: production
-    env:
-      # Optional: leave the secret unset while CloudFront is disabled.
-      CF_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
     steps:
       - uses: actions/checkout@v4
 
@@ -54,12 +51,12 @@ jobs:
       - name: Stamp build version
         run: echo "${GITHUB_SHA::7} ($(date -u +%Y-%m-%dT%H:%MZ))" > "$SITE_DIR/version.txt"
 
-      - name: Sync assets (long cache)
+      - name: Sync assets (short cache)
         run: |
           aws s3 sync "$SITE_DIR" "s3://${{ secrets.S3_BUCKET }}" \
             --delete \
             --exclude "*.html" --exclude "version.txt" \
-            --cache-control "public, max-age=86400"
+            --cache-control "public, max-age=300"
 
       - name: Upload HTML and version (no cache)
         run: |
@@ -67,9 +64,5 @@ jobs:
             --exclude "*" --include "*.html" --include "version.txt" \
             --cache-control "no-cache"
 
-      - name: Invalidate CloudFront
-        if: env.CF_DISTRIBUTION_ID != ''
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id "$CF_DISTRIBUTION_ID" \
-            --paths "/*"
+      - name: Show site URL
+        run: echo "Deployed to http://${{ secrets.S3_BUCKET }}.s3-website.${AWS_REGION}.amazonaws.com"

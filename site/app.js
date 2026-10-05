@@ -3,7 +3,7 @@ const routes = {
   "/": `
     <div class="card">
       <h2>Welcome</h2>
-      <p>This single-page app is hosted on Amazon S3 and served through CloudFront.</p>
+      <p>This single-page app is hosted on Amazon S3 as a static website.</p>
       <p>Every push to <code>main</code> deploys it automatically with GitHub Actions.</p>
     </div>`,
   "/about": `
@@ -19,7 +19,6 @@ const routes = {
         <li>Developer pushes to <code>main</code></li>
         <li>GitHub Actions validates the site</li>
         <li>Files are synced to S3</li>
-        <li>The CloudFront cache is invalidated</li>
       </ol>
     </div>`,
 };
