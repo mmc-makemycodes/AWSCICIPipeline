@@ -4,12 +4,14 @@ output "bucket_name" {
 }
 
 output "cloudfront_distribution_id" {
-  description = "GitHub secret CLOUDFRONT_DISTRIBUTION_ID"
-  value       = aws_cloudfront_distribution.site.id
+  description = "GitHub secret CLOUDFRONT_DISTRIBUTION_ID (empty when CloudFront is disabled)"
+  value       = try(aws_cloudfront_distribution.site[0].id, "")
 }
 
 output "website_url" {
-  value = "https://${aws_cloudfront_distribution.site.domain_name}"
+  value = (var.enable_cloudfront
+    ? "https://${aws_cloudfront_distribution.site[0].domain_name}"
+  : "http://${aws_s3_bucket_website_configuration.site[0].website_endpoint}")
 }
 
 output "deployer_user" {

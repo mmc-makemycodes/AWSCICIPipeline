@@ -17,6 +17,12 @@ python -m http.server 8080     # open http://localhost:8080
 
 ## 2. Create the infrastructure (one time)
 
+Hosting mode is set by `enable_cloudfront` in `infra/variables.tf`:
+
+- `false` (default): public S3 static website, HTTP only. Works on any account.
+- `true`: private bucket behind CloudFront, HTTPS. New AWS accounts must first be verified
+  by AWS Support (open a free "Account and billing" case quoting the CloudFront AccessDenied error).
+
 ```bash
 cd infra
 terraform init
@@ -39,7 +45,7 @@ Repo -> Settings -> Secrets and variables -> Actions -> New repository secret
 | `AWS_ACCESS_KEY_ID` | from step 3 |
 | `AWS_SECRET_ACCESS_KEY` | from step 3 |
 | `S3_BUCKET` | `terraform output -raw bucket_name` |
-| `CLOUDFRONT_DISTRIBUTION_ID` | `terraform output -raw cloudfront_distribution_id` |
+| `CLOUDFRONT_DISTRIBUTION_ID` | `terraform output -raw cloudfront_distribution_id` (only when CloudFront is enabled) |
 
 ## 5. Deploy
 
